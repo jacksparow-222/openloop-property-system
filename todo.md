@@ -78,8 +78,8 @@
 
 ## Phase 10: Documentation & Delivery
 - [x] Create comprehensive setup instructions
-- [x] Document API endpoints and procedures
-- [x] Create user guide for dashboard
+- [x] Document API endpoints and procedures (API_DOCS.md)
+- [x] Create user guide for dashboard (USER_GUIDE.md)
 - [x] Prepare deployment checklist
 - [x] Final testing and bug fixes
 - [x] Deliver project to user
