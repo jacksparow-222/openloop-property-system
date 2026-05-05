@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, properties, leads, sheetsSyncLog, InsertProperty, InsertLead, InsertSheetsSyncLog } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,78 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ── Property queries ──
+export async function createProperty(data: InsertProperty) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(properties).values(data);
+}
+
+export async function getProperties() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(properties).orderBy(properties.createdAt);
+}
+
+export async function getPropertyByPropertyId(propertyId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(properties).where(eq(properties.propertyId, propertyId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateProperty(id: number, data: Partial<InsertProperty>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(properties).set(data).where(eq(properties.id, id));
+}
+
+export async function deleteProperty(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.delete(properties).where(eq(properties.id, id));
+}
+
+// ── Lead queries ──
+export async function createLead(data: InsertLead) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(leads).values(data);
+}
+
+export async function getLeads() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(leads).orderBy(leads.createdAt);
+}
+
+export async function getLeadsByPropertyId(propertyId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(leads).where(eq(leads.propertyId, propertyId)).orderBy(leads.createdAt);
+}
+
+export async function updateLeadStatus(id: number, status: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(leads).set({ status: status as any }).where(eq(leads.id, id));
+}
+
+export async function updateLeadSmsStatus(leadId: string, sent: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(leads).set({ smsSent: sent ? 1 : 0 }).where(eq(leads.leadId, leadId));
+}
+
+export async function updateLeadSheetsSyncStatus(leadId: string, synced: boolean) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.update(leads).set({ sheetsSync: synced ? 1 : 0 }).where(eq(leads.leadId, leadId));
+}
+
+// ── Sheets sync log queries ──
+export async function logSheetsSync(data: InsertSheetsSyncLog) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.insert(sheetsSyncLog).values(data);
+}
